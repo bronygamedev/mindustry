@@ -10,7 +10,11 @@ info_parsed = json.loads(info)
 base_path = path.dirname(path.abspath(__file__))
 download_url = f'https://github.com/Anuken/Mindustry/releases/download/{info_parsed["tag_name"]}/Mindustry.jar'
 config_file_path = base_path + "/config.json"
-config: dict
+if path.isfile(config_file_path):
+    with open(config_file_path, "r") as f:
+        config = json.loads(f.read())
+else:
+    config = {"version": "v1"}
 
 
 def check_for_version_change(new_version: str):
@@ -21,15 +25,8 @@ def check_for_version_change(new_version: str):
             return True
     return False
 
-def get_config():
-    if path.isfile(config_file_path):
-        with open(config_file_path, "r") as f:
-            config = json.loads(f.read())
-    else:
-        config = {"version": "v1"}
 
 if __name__ == "__main__":
-    config  = get_config()
     if check_for_version_change(info_parsed["tag_name"]):
         with open("Mindustry.jar", "wb") as f:
             f.write(requests.get(download_url).content)
